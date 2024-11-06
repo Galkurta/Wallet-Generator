@@ -1,0 +1,30 @@
+{
+  "name": "wallet-generator",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "keywords": [
+    "blockchain",
+    "wallet",
+    "generator",
+    "ton",
+    "sui",
+    "solana",
+    "evm"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "Multi-chain wallet generator for TON, SUI, Solana, and EVM",
+  "dependencies": {
+    "@mysten/sui.js": "^0.54.1",
+    "@solana/web3.js": "^1.95.4",
+    "chalk": "^5.3.0",
+    "ethers": "^6.13.4",
+    "inquirer": "^12.0.1",
+    "tonweb": "^0.0.66",
+    "tonweb-mnemonic": "^1.0.1"
+  }
+}
