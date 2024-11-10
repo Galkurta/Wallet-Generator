@@ -1,10 +1,19 @@
 import chalk from "chalk";
 import inquirer from "inquirer";
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import { format } from "date-fns";
 import TONWalletGenerator from "../generators/tonWallet.js";
 import SuiWalletGenerator from "../generators/suiWallet.js";
 import SolanaWalletGenerator from "../generators/solanaWallet.js";
 import EVMWalletGenerator from "../generators/evmWallet.js";
+import IBCWalletGenerator from "../generators/ibcWallet.js";
 import { createBanner } from "../constants/banner.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 class WalletGeneratorService {
   constructor() {
@@ -13,7 +22,13 @@ class WalletGeneratorService {
       sui: new SuiWalletGenerator(),
       solana: new SolanaWalletGenerator(),
       evm: new EVMWalletGenerator(),
+      ibc: new IBCWalletGenerator(),
     };
+    this.outputDir = path.join(dirname(__dirname), "../output");
+  }
+
+  getFormattedTimestamp() {
+    return format(new Date(), "yyyy-MM-dd_HH-mm-ss");
   }
 
   async promptForNetwork() {
@@ -31,6 +46,22 @@ class WalletGeneratorService {
       },
     ]);
     return network;
+  }
+
+  async promptForIBCChain(ibcChains) {
+    const { chain } = await inquirer.prompt([
+      {
+        type: "list",
+        name: "chain",
+        message: chalk.green("Select IBC Chain:"),
+        choices: ibcChains.map((chain) => ({
+          name: chalk.yellow(`${chain.name} (${chain.denom})`),
+          value: chain,
+        })),
+        pageSize: 15,
+      },
+    ]);
+    return chain;
   }
 
   async promptForWalletCount() {
@@ -87,6 +118,75 @@ class WalletGeneratorService {
     return action;
   }
 
+  async ensureOutputDir() {
+    try {
+      await fs.mkdir(this.outputDir, { recursive: true });
+      return this.outputDir;
+    } catch (error) {
+      if (error.code !== "EEXIST") {
+        throw error;
+      }
+      return this.outputDir;
+    }
+  }
+
+  async generateIBCWallets(generator, selectedChain, numberOfWallets) {
+    const wallets = [];
+    console.log(
+      chalk.cyan(
+        `\nStarting generation of ${numberOfWallets} ${selectedChain.name} wallet(s)...`
+      )
+    );
+
+    for (let i = 0; i < numberOfWallets; i++) {
+      const wallet = await generator.generateWallet(selectedChain);
+      wallets.push(wallet);
+      console.log(chalk.green(`Generated wallet ${i + 1}/${numberOfWallets}`));
+    }
+
+    const timestamp = this.getFormattedTimestamp();
+    const chainName = selectedChain.name.toLowerCase().replace(/\s+/g, "_");
+
+    // File untuk detail lengkap
+    const detailsFileName = `${chainName}_wallet_details_${timestamp}.txt`;
+    const addressesFileName = `${chainName}_addresses_${timestamp}.txt`;
+
+    const outputDir = await this.ensureOutputDir();
+    const detailsPath = path.join(outputDir, detailsFileName);
+    const addressesPath = path.join(outputDir, addressesFileName);
+
+    // Format untuk file detail lengkap
+    const detailsContent = wallets
+      .map(
+        (wallet, index) =>
+          `Wallet #${index + 1}\n` +
+          `Chain: ${wallet.chain}\n` +
+          `Chain ID: ${wallet.chain_id}\n` +
+          `Address: ${wallet.address}\n` +
+          `Mnemonic: ${wallet.mnemonic}\n` +
+          `Public Key: ${wallet.publicKey}\n` +
+          `HD Path: ${wallet.hdPath}\n` +
+          `Denom: ${wallet.denom}\n` +
+          `RPC: ${wallet.rpc_endpoint}\n` +
+          `REST: ${wallet.rest_endpoint}\n` +
+          "-".repeat(50) +
+          "\n"
+      )
+      .join("\n");
+
+    // Format untuk file addresses only
+    const addressesContent = wallets.map((wallet) => wallet.address).join("\n");
+
+    await Promise.all([
+      fs.writeFile(detailsPath, detailsContent),
+      fs.writeFile(addressesPath, addressesContent),
+    ]);
+
+    console.log(chalk.green("\nGeneration completed successfully!"));
+    console.log(chalk.cyan(`Full details saved to: ${detailsFileName}`));
+    console.log(chalk.cyan(`Addresses only saved to: ${addressesFileName}`));
+  }
+
   async generateWallets() {
     try {
       createBanner();
@@ -104,6 +204,12 @@ class WalletGeneratorService {
         const network = await this.promptForNetwork();
         const generator = this.generators[network];
 
+        let selectedChain;
+        if (network === "ibc") {
+          const ibcChains = generator.getAvailableChains();
+          selectedChain = await this.promptForIBCChain(ibcChains);
+        }
+
         const numberOfWallets = await this.promptForWalletCount();
 
         if (numberOfWallets > 100) {
@@ -114,10 +220,18 @@ class WalletGeneratorService {
           }
         }
 
-        await generator.generateBulkWallets(
-          numberOfWallets,
-          network.toUpperCase()
-        );
+        if (network === "ibc") {
+          await this.generateIBCWallets(
+            generator,
+            selectedChain,
+            numberOfWallets
+          );
+        } else {
+          await generator.generateBulkWallets(
+            numberOfWallets,
+            network.toUpperCase()
+          );
+        }
 
         const { again } = await inquirer.prompt([
           {

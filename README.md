@@ -9,6 +9,7 @@ A command-line tool to generate wallets for multiple blockchain networks. Curren
   - SUI (Sui Network)
   - Solana
   - EVM (Ethereum Virtual Machine)
+  - IBC (Inter-Blockchain Communication)
 - Bulk wallet generation
 - User-friendly CLI with arrow key navigation
 - Progress indicators and colorful interface

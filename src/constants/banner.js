@@ -8,22 +8,24 @@ export const createBanner = () => {
     ██║╚██╔╝██║██║   ██║██║     ██║   ██║    ██║     ██╔══██║██╔══██║██║██║╚██╗██║
     ██║ ╚═╝ ██║╚██████╔╝███████╗██║   ██║    ╚██████╗██║  ██║██║  ██║██║██║ ╚████║
     ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝     ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝
-                            Wallet Generator v1.0.0
-                             Created by: Galkurta                                                                             
+                                Wallet Generator
+                              Created by: Galkurta                                                                             
     `;
 
   const info = `
     ╔════════════════════════════════════════════════════════════════╗
-    ║                    Supported Blockchains:                      ║
+    ║                    Supported Blockchains                       ║
+    ╠════════════════════════════════════════════════════════════════╣
     ║                                                                ║
-    ║  > TON     - The Open Network (v4R2)                           ║
-    ║  > SUI     - Sui Network                                       ║
-    ║  > SOL     - Solana                                            ║
-    ║  > EVM     - Ethereum Virtual Machine                          ║
+    ║  [1] TON  - The Open Network (v4R2)                            ║
+    ║  [2] SUI  - Sui Network                                        ║
+    ║  [3] SOL  - Solana                                             ║
+    ║  [4] EVM  - Ethereum Virtual Machine                           ║
+    ║  [5] IBC  - Inter-Blockchain Communication                     ║
     ║                                                                ║
     ╚════════════════════════════════════════════════════════════════╝
     `;
 
-  console.log(chalk.cyan(banner));
-  console.log(chalk.yellow(info));
+  console.log(chalk.blue(banner));
+  console.log(chalk.green(info));
 };
