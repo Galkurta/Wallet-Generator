@@ -147,7 +147,6 @@ class WalletGeneratorService {
     const timestamp = this.getFormattedTimestamp();
     const chainName = selectedChain.name.toLowerCase().replace(/\s+/g, "_");
 
-    // File untuk detail lengkap
     const detailsFileName = `${chainName}_wallet_details_${timestamp}.txt`;
     const addressesFileName = `${chainName}_addresses_${timestamp}.txt`;
 
@@ -155,7 +154,6 @@ class WalletGeneratorService {
     const detailsPath = path.join(outputDir, detailsFileName);
     const addressesPath = path.join(outputDir, addressesFileName);
 
-    // Format untuk file detail lengkap
     const detailsContent = wallets
       .map(
         (wallet, index) =>
@@ -174,7 +172,6 @@ class WalletGeneratorService {
       )
       .join("\n");
 
-    // Format untuk file addresses only
     const addressesContent = wallets.map((wallet) => wallet.address).join("\n");
 
     await Promise.all([

@@ -59,6 +59,19 @@ npm start
 Wallet-Generator/
 ├── package.json
 ├── src/
+│   ├── chains/
+│   │   └── ibc/
+│   │       ├── index.js
+│   │       ├── cosmos.js
+│   │       ├── osmosis.js
+│   │       ├── neutron.js
+│   │       ├── celestia.js
+│   │       ├── sei.js
+│   │       ├── stride.js
+│   │       ├── injective.js
+│   │       ├── axelar.js
+│   │       ├── secret.js
+│   │       └── kava.js
 │   ├── constants/
 │   │   └── banner.js
 │   ├── core/
@@ -67,12 +80,14 @@ Wallet-Generator/
 │   │   ├── tonWallet.js
 │   │   ├── suiWallet.js
 │   │   ├── solanaWallet.js
-│   │   └── evmWallet.js
+│   │   ├── evmWallet.js
+│   │   └── ibcWallet.js
 │   ├── services/
 │   │   └── walletService.js
-│   └── main.js
-└── output/
-    └── .gitkeep
+│   └── index.js
+├── output/
+│   └── .gitkeep
+└── README.md
 ```
 
 ## Dependencies
